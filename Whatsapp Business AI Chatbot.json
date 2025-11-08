@@ -1,0 +1,239 @@
+{
+  "name": "Business wtsp",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}\nYou are an AI assistant that must always answer using data from the Google Sheet first.\nIf the user’s question matches or is similar to any row in the sheet, use that answer.\nIf not found, then you can use your general AI knowledge.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        192,
+        16
+      ],
+      "id": "a28e9980-f158-44df-895a-076cc4e76895",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "a1511322-8e57-4e79-aad5-944dc0bb9b91",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "btI3WIUGlsU3C0k3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        208
+      ],
+      "id": "eb649040-16c1-4237-b06d-b9a9850af0a4",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1iVdJxpfR4GVpc-nEBIgAiuyfmvk6aXh0_T4EGjBb6n8",
+          "mode": "list",
+          "cachedResultName": "Chitral ai",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iVdJxpfR4GVpc-nEBIgAiuyfmvk6aXh0_T4EGjBb6n8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iVdJxpfR4GVpc-nEBIgAiuyfmvk6aXh0_T4EGjBb6n8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        224
+      ],
+      "id": "3aed3a98-515c-4df7-a2a8-4c8fb8344d77",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OQw8pRKVEFSEc2fS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        16
+      ],
+      "id": "4d2a6613-3d42-4f0a-aac9-c961691f3ede",
+      "name": "WhatsApp Trigger",
+      "webhookId": "7a8b4c1f-f736-4816-b6a8-214bce1aff4a",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "q2nCirtPYbAvbOp2",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "813118355222385",
+        "recipientPhoneNumber": "+919949023132",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        0
+      ],
+      "id": "b8c3768b-c638-4e1a-acde-972a6d864a9b",
+      "name": "Send message",
+      "webhookId": "e5516cb0-1a47-4fa4-a2e2-f2fcccdfc7b9",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "gb9Uq3ANcgblnaTw",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v21.0/813118355222385/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAfO3ErV6BoBP0lZAQU0KvLhO8J36AQ7lyx79GcPzzz3IbagspoFgWaGM77New3QhKZBacFnM0VDp6TrHncb4WUQ1iYjOzWPfy7xeQmTSHRCLmW7Ffsp4pIyZBKBMOIAgPnZCchte4DE5QaTSQe2HXhhZBsembcONyXWqyEbz3bxVdXszJiZCYDGyxHwN2vVd8uE1JWhftRvrgUpZCeW773h9A8UEmKdwJtt8BfpTT0cWx7ZAkeZCxr0ZAj4mgIZCfAOW5IsQXKNsLj4vYylpeSZAmCSzwZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"={{ $('WhatsApp Trigger').item.json.messages[0].id }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"https://i.postimg.cc/prR86Jdn/Screenshot-2025-10-31-101457.png\",\n    \"caption\": \"={{$json.output}}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        528,
+        112
+      ],
+      "id": "948b5ccd-feb1-4070-b3bd-9ee018ba7b85",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "762c41a8-4a38-4236-9041-071b4094b1e8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "114f1fe1bf851aa2ec84b59528ca2e27192a3fab50a44f56d2222f848e95270f"
+  },
+  "id": "HIHjFiVyufVCDKaS",
+  "tags": []
+}

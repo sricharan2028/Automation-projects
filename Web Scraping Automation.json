@@ -1,0 +1,237 @@
+{
+  "name": "Web scraping",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2f66e1d3-0372-4ecc-9506-97baf58cc8ca",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brightdata.com/request",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 4b941554bb7fdc525349858c41c23b5615b42a918d18c8fedf747a7409970595"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "zone",
+              "value": "web_unlocker1"
+            },
+            {
+              "name": "url",
+              "value": "https://thehyderabaddutyfree.com/"
+            },
+            {
+              "name": "format",
+              "value": "raw"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "527c0a30-0955-45e3-8457-2e05c35922f5",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Here is the information from a scraped website: {{ $json.data }}\n\nExtract only the brand, model, and price of each product.\n\nReturn the result strictly as valid JSON — no text or markdown, only the JSON array.\n\nFollow this exact key structure:\n[\n  {\n    \"brand\": \"\",\n    \"model\": \"\",\n    \"price\": \"\"\n  }\n]\n\nIf a field is missing on the website, return an empty string for it.\nDo NOT include any other keys such as \"product_description\" or \"name\".\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7e65c490-7cf2-4e3b-994a-2a8fafbf978d",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OFbSizDgYWT3nUQw",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "12B0KqRVLkckIBuIWM7GrF_eE4Q0lsLiSk1gM6pWaZ3Y",
+          "mode": "list",
+          "cachedResultName": "Liquor ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12B0KqRVLkckIBuIWM7GrF_eE4Q0lsLiSk1gM6pWaZ3Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12B0KqRVLkckIBuIWM7GrF_eE4Q0lsLiSk1gM6pWaZ3Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Brand": "={{ $json.brand }}",
+            "Model": "={{ $json.model }}",
+            "Price": "={{ $json.price }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Brand",
+              "displayName": "Brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Model",
+              "displayName": "Model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Price",
+              "displayName": "Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        0
+      ],
+      "id": "22c48ec0-0aa4-4bc9-9d89-3c34e9b6d421",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OQw8pRKVEFSEc2fS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the JSON string from the previous node\nconst data = JSON.parse($input.item.json.message.content);\n\n// Convert each product into a separate n8n item\nreturn data.map(product => ({ json: product }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "4d287e69-5cbe-4677-b5d3-c13aa6c03dce",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "99792dcf-7198-415c-a3a8-97b0c1dfc85a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "114f1fe1bf851aa2ec84b59528ca2e27192a3fab50a44f56d2222f848e95270f"
+  },
+  "id": "pwJ2ogEjVqr8fT9P",
+  "tags": []
+}
